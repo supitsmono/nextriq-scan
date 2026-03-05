@@ -1,5 +1,5 @@
 const GOOGLE_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycby0tayQaw9UMdyJ2kiGXRYdEOG6sKiQOPsJ9VcTIpr5_9QqyS6dgkOwubPgev0Mcng6/exec";
+  "https://script.google.com/macros/s/AKfycbyMiw0byhLqQqwbbQM_rO4D8OoKmIwtyuAXeHmvzsIvBhcfARujBML7U0eQJBBY2kFq/exec";
 
 /** Map wizard form data naar de kolommen van je Google Sheet: datum, bedrijfsnaam, naam, email, sector, omzet, pijnpunten, technologie, strategie */
 function mapToSheetPayload(data: Record<string, unknown>): Record<string, string> {
