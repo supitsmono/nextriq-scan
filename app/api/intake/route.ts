@@ -24,96 +24,200 @@ function strArray(v: unknown): string[] {
   return v.filter((x): x is string => typeof x === "string");
 }
 
-/** Map internal value to Airtable-friendly label; fallback to original if unknown. */
-function toLabel(map: Record<string, string>, value: string): string {
+/** Map form value to exact Airtable Single select option; return empty if no match (don't create new options). */
+function toAirtableOption(map: Record<string, string>, value: string): string {
   if (!value) return "";
-  return map[value] ?? value;
+  return map[value] ?? "";
 }
 
-// ─── Value → label mappings (form select values → leesbare waarden voor Airtable) ───
-const JAAROMZET_LABELS: Record<string, string> = {
-  lt200k: "< €200k",
-  "200k_500k": "€200k – €500k",
-  "500k_1m": "€500k – €1M",
-  "1m_2_5m": "€1M – €2.5M",
-  "2_5m_5m": "€2.5M – €5M",
-  "5m_10m": "€5M – €10M",
-  gt10m: "> €10M",
+/** Map form sector (vrije tekst) naar exacte Airtable sector-optie. */
+function mapSectorToAirtable(sector: string): string {
+  if (!sector) return "";
+  const s = sector.toLowerCase();
+  const mapping: Record<string, string> = {
+    "handel & retail": "Retail",
+    "productie & industrie": "Industrie",
+    "zakelijke dienstverlening": "Zakelijke Dienstverlening",
+    "technologie & it": "Technologie",
+    "bouw & vastgoed": "Bouw",
+    "transport & logistiek": "Logistiek",
+    "zorg & welzijn": "Zorg",
+    "horeca & toerisme": "Detailhandel",
+    "financiën & verzekeringen": "Financieel",
+    "onderwijs": "Onderwijs",
+    "landbouw & voedsel": "Landbouw",
+    "voedingsmiddelen": "Voedingsmiddelen",
+    "retail": "Retail",
+    "technologie": "Technologie",
+    "gezondheidszorg": "Gezondheidszorg",
+    "zorg": "Zorg",
+    "logistiek": "Logistiek",
+    "bouw": "Bouw",
+    "marketing": "Marketing",
+    "juridisch": "Juridisch",
+    "overheid": "Overheid",
+    "non-profit": "Non-profit",
+    "anders": "Overig",
+  };
+  for (const [key, airtable] of Object.entries(mapping)) {
+    if (s.includes(key) || key.includes(s)) return airtable;
+  }
+  return "Overig";
+}
+
+/** Map form Daily tools labels naar exacte Airtable Multiple select opties. */
+function mapDailyToolsToAirtable(tools: string[]): string[] {
+  const map: Record<string, string[]> = {
+    "Microsoft Office": ["MS Office"],
+    "Google Workspace": ["Google Workspace"],
+    "Boekhoudpakket": ["Anders"],
+    "Project management": ["Trello"],
+    "Slack / Teams / WhatsApp": ["Slack", "Teams", "WhatsApp"],
+    "E-commerce": ["Anders"],
+    "WMS": ["Anders"],
+    "Planning software": ["Anders"],
+    "Geen": [],
+  };
+  const allowed = new Set(["MS Office", "Google Workspace", "Slack", "Teams", "Trello", "Asana", "Custom", "Anders", "Excel", "Outlook", "WhatsApp", "Exact", "AFAS", "Salesforce", "Magister", "HubSpot", "Word"]);
+  const out: string[] = [];
+  for (const t of tools) {
+    const mapped = map[t];
+    if (mapped) {
+      for (const m of mapped) {
+        if (m && allowed.has(m) && !out.includes(m)) out.push(m);
+      }
+    } else if (allowed.has(t) && !out.includes(t)) {
+      out.push(t);
+    } else if (t && !out.includes("Anders")) {
+      out.push("Anders");
+    }
+  }
+  return out;
+}
+
+/** Map form prioriteiten naar exacte Airtable Multiple select opties. */
+function mapPrioriteitenToAirtable(priorities: string[]): string[] {
+  const map: Record<string, string> = {
+    "Kosten besparen": "Kostenbesparing",
+    "Sneller groeien": "Groei",
+    "Foutpercentage verlagen": "Foutreductie",
+    "Klanttevredenheid verhogen": "Klanttevredenheid",
+    "Schaalbaarheid verbeteren": "Groei",
+    "Beter inzicht in cijfers": "Inzicht",
+    "Concurrentievoordeel": "Innovatie",
+    "Innovatie": "Innovatie",
+  };
+  const out: string[] = [];
+  for (const p of priorities) {
+    const mapped = map[p] ?? "Anders";
+    if (mapped && !out.includes(mapped)) out.push(mapped);
+  }
+  return out;
+}
+
+/** Map form process tools naar exacte Airtable Multiple select opties. */
+function mapProcessToolsToAirtable(tools: string[]): string[] {
+  const map: Record<string, string> = {
+    "Excel": "Excel",
+    "Email": "Outlook",
+    "ERP": "Anders",
+    "CRM": "Anders",
+    "Boekhouding": "Exact Online",
+    "Planning software": "Anders",
+    "Anders": "Anders",
+  };
+  const out: string[] = [];
+  for (const t of tools) {
+    const mapped = map[t] ?? "Anders";
+    if (mapped && !out.includes(mapped)) out.push(mapped);
+  }
+  return out;
+}
+
+// ─── Form value → exact Airtable Single select option (uit schema NEXTRIQ crm) ───
+const ANNUAL_REVENUE_AIRTABLE: Record<string, string> = {
+  lt200k: "< €1M",
+  "200k_500k": "€500K-1M",
+  "500k_1m": "€500K-1M",
+  "1m_2_5m": "€1M-€5M",
+  "2_5m_5m": "€1M-€5M",
+  "5m_10m": "€5-10M",
+  gt10m: "€5M-€20M",
 };
-const MEDEWERKERS_LABELS: Record<string, string> = {
-  "1_5": "1 – 5",
-  "6_10": "6 – 10",
-  "11_25": "11 – 25",
-  "26_50": "26 – 50",
-  "51_100": "51 – 100",
-  "100plus": "100+",
+const EMPLOYEES_AIRTABLE: Record<string, string> = {
+  "1_5": "1-10",
+  "6_10": "2-10",
+  "11_25": "11-50",
+  "26_50": "11-50",
+  "51_100": "51-200",
+  "100plus": "201-1000",
 };
-const REPETITIEF_UREN_LABELS: Record<string, string> = {
-  lt5u: "< 5 uur",
-  "5_10u": "5 – 10 uur",
-  "10_20u": "10 – 20 uur",
-  "20_40u": "20 – 40 uur",
-  gt40u: "> 40 uur",
+const TIME_IN_HOURS_AIRTABLE: Record<string, string> = {
+  lt5u: "2-5 uur",
+  "5_10u": "6-10 uur",
+  "10_20u": "11-20 uur",
+  "20_40u": "26-50",
+  gt40u: "51-100",
 };
-const FOUT_KOSTEN_LABELS: Record<string, string> = {
-  lt50: "< €50",
-  "50_200": "€50 – €200",
-  "200_1000": "€200 – €1.000",
-  gt1000: "€1.000+",
-  onbekend: "Weet ik niet",
+const MISTAKE_COSTS_AIRTABLE: Record<string, string> = {
+  lt50: "<€1.000",
+  "50_200": "<€1.000",
+  "200_1000": "€1.000-€5.000",
+  gt1000: "€1K-€10K",
+  onbekend: "Onbekend",
 };
-const GROEI_LABELS: Record<string, string> = {
-  stabiel: "Stabiel (< 5%)",
-  "5_15pct": "5 – 15%",
-  "15_30pct": "15 – 30%",
-  gt30pct: "> 30%",
+const COMPANY_GROW_AIRTABLE: Record<string, string> = {
+  stabiel: "Stabiel",
+  "5_15pct": "Matige groei",
+  "15_30pct": "Sterke groei",
+  gt30pct: "Sterke groei",
   krimp: "Krimp",
 };
-const JA_NEE_LABELS: Record<string, string> = {
+const CRM_USAGE_AIRTABLE: Record<string, string> = {
   ja: "Ja",
   nee: "Nee",
 };
-const AANTAL_SYSTEMEN_LABELS: Record<string, string> = {
-  "1_3": "1–3",
-  "4_6": "4–6",
-  "7_10": "7–10",
-  "10plus": "10+",
+const CURRENT_SYSTEMS_AIRTABLE: Record<string, string> = {
+  "1_3": "2-3",
+  "4_6": "4-6",
+  "7_10": "6-10",
+  "10plus": "7+",
 };
-const INTEGRATIES_LABELS: Record<string, string> = {
-  volledig: "Volledig gekoppeld",
-  deels: "Deels gekoppeld",
-  niet: "Niet gekoppeld",
-  weet_niet: "Weet ik niet",
+const INTEGRATIONS_AIRTABLE: Record<string, string> = {
+  volledig: "Uitgebreid",
+  deels: "Beperkt",
+  niet: "Geen",
+  weet_niet: "Geen",
 };
-const BUDGET_LABELS: Record<string, string> = {
-  ja: "Ja",
-  overweging: "In overweging",
-  nog_niet: "Nog niet",
+const BUDGET_AIRTABLE: Record<string, string> = {
+  ja: "Onbekend",
+  overweging: "Onbekend",
+  nog_niet: "Onbekend",
 };
-const TIMELINE_LABELS: Record<string, string> = {
-  "1_2m": "1–2 maanden",
-  "3_6m": "3–6 maanden",
-  "6_12m": "6–12 maanden",
-  gt12m: ">12 maanden",
+const TIMELINE_AIRTABLE: Record<string, string> = {
+  "1_2m": "Binnen 3 maanden",
+  "3_6m": "Binnen 6 maanden",
+  "6_12m": "Binnen 12 maanden",
+  gt12m: "Onbekend",
 };
-const FREQUENTIE_LABELS: Record<string, string> = {
+const FREQUENTIE_AIRTABLE: Record<string, string> = {
   dagelijks: "Dagelijks",
   wekelijks: "Wekelijks",
   maandelijks: "Maandelijks",
-  ad_hoc: "Ad hoc",
+  ad_hoc: "Onregelmatig",
 };
-const TIJD_PER_TAK_LABELS: Record<string, string> = {
-  lt10min: "< 10 min",
-  "10_30min": "10 – 30 min",
-  "30_60min": "30 – 60 min",
-  "1_2uur": "1 – 2 uur",
-  gt2uur: "> 2 uur",
+const TIME_PROCESS_AIRTABLE: Record<string, string> = {
+  lt10min: "< 15m",
+  "10_30min": "15-30m",
+  "30_60min": "30-60m",
+  "1_2uur": "1-2 uur",
+  gt2uur: "2-4 uur",
 };
-const AANTAL_MENSEN_LABELS: Record<string, string> = {
-  "1": "1 persoon",
-  "2_3": "2 – 3 personen",
-  "4_6": "4 – 6 personen",
-  "7plus": "7 of meer",
+const AANTAL_MENSEN_AIRTABLE: Record<string, string> = {
+  "1": "1",
+  "2_3": "2-5",
+  "4_6": "6-10",
+  "7plus": "11-25",
 };
 
 /** Build Intakes table fields – Airtable field names must match exactly. */
@@ -171,6 +275,20 @@ function buildIntakeFields(payload: WizardPayload, createdAt: string): Record<st
   const timeline = pickFirst(payload.timeline);
   const extraContext = pickFirst(payload.extra_context, payload.extraContext);
 
+  const sectorMapped = mapSectorToAirtable(sector);
+  const annualRevenueMapped = toAirtableOption(ANNUAL_REVENUE_AIRTABLE, annualRevenue);
+  const employeesMapped = toAirtableOption(EMPLOYEES_AIRTABLE, employees);
+  const timeInHoursMapped = toAirtableOption(TIME_IN_HOURS_AIRTABLE, timeInHours);
+  const mistakeCostsMapped = toAirtableOption(MISTAKE_COSTS_AIRTABLE, mistakeCosts);
+  const companyGrowMapped = toAirtableOption(COMPANY_GROW_AIRTABLE, companyGrow);
+  const crmUsageMapped = toAirtableOption(CRM_USAGE_AIRTABLE, crmUsage);
+  const dailyToolsMapped = mapDailyToolsToAirtable(dailyTools);
+  const currentSystemsMapped = toAirtableOption(CURRENT_SYSTEMS_AIRTABLE, currentSystems);
+  const integrationsMapped = toAirtableOption(INTEGRATIONS_AIRTABLE, integrations);
+  const prioriteitenMapped = mapPrioriteitenToAirtable(prioriteiten);
+  const budgetMapped = toAirtableOption(BUDGET_AIRTABLE, budget);
+  const timelineMapped = toAirtableOption(TIMELINE_AIRTABLE, timeline);
+
   const fields: Record<string, unknown> = {
     Company: company || "",
     created_at: createdAt,
@@ -178,26 +296,26 @@ function buildIntakeFields(payload: WizardPayload, createdAt: string): Record<st
     email: str(payload.email),
     Function: fn || "",
     Phone_number: phone || "",
-    sector: sector || "",
-    Annual_Revenue: toLabel(JAAROMZET_LABELS, annualRevenue) || annualRevenue || "",
-    Employees: toLabel(MEDEWERKERS_LABELS, employees) || employees || "",
+    sector: sectorMapped || "",
+    Annual_Revenue: annualRevenueMapped || "",
+    Employees: employeesMapped || "",
     Lost_time: lostTime || "",
-    "Time_in_hours": toLabel(REPETITIEF_UREN_LABELS, timeInHours) || timeInHours || "",
+    "Time_in_hours": timeInHoursMapped || "",
     Mistakes: mistakes || "",
-    "Mistake costs": toLabel(FOUT_KOSTEN_LABELS, mistakeCosts) || mistakeCosts || "",
-    "Company's grow": toLabel(GROEI_LABELS, companyGrow) || companyGrow || "",
+    "Mistake costs": mistakeCostsMapped || "",
+    "Company's grow": companyGrowMapped || "",
     watAlsOmzetVerdubbelt: watAls || "",
     "ERP name": erpName || "",
-    "CRM usage": toLabel(JA_NEE_LABELS, crmUsage) || crmUsage || "",
+    "CRM usage": crmUsageMapped || "",
     "CRM name": crmName || "",
-    "Daily tools": dailyTools,
-    "Current Systems": toLabel(AANTAL_SYSTEMEN_LABELS, currentSystems) || currentSystems || "",
-    Integrations: toLabel(INTEGRATIES_LABELS, integrations) || integrations || "",
+    "Daily tools": dailyToolsMapped,
+    "Current Systems": currentSystemsMapped || "",
+    Integrations: integrationsMapped || "",
     "Main goal": mainGoal || "",
-    prioriteiten,
+    prioriteiten: prioriteitenMapped,
     "Biggest impact": biggestImpact || "",
-    budgetAutomatisering: toLabel(BUDGET_LABELS, budget) || budget || "",
-    timeline: toLabel(TIMELINE_LABELS, timeline) || timeline || "",
+    budgetAutomatisering: budgetMapped || "",
+    timeline: timelineMapped || "",
     extraContext: extraContext || "",
     raw_json: JSON.stringify(payload, null, 2),
   };
@@ -226,6 +344,7 @@ function buildProcessFields(
   const freq = pickFirst(process.frequency, process.frequentie);
   const tijd = pickFirst(process.time_per_task, process.tijdPerKeer);
   const mensen = pickFirst(process.people_involved, process.aantalMensen);
+  const toolsMapped = mapProcessToolsToAirtable(tools);
 
   return {
     Process: processName || "",
@@ -235,10 +354,10 @@ function buildProcessFields(
     email,
     proces_index: index + 1,
     Description: pickFirst(process.description, process.beschrijving) || "",
-    frequentie: toLabel(FREQUENTIE_LABELS, freq) || freq || "",
-    Time: toLabel(TIJD_PER_TAK_LABELS, tijd) || tijd || "",
-    aantalMensen: toLabel(AANTAL_MENSEN_LABELS, mensen) || mensen || "",
-    tools,
+    frequentie: toAirtableOption(FREQUENTIE_AIRTABLE, freq) || "",
+    Time: toAirtableOption(TIME_PROCESS_AIRTABLE, tijd) || "",
+    aantalMensen: toAirtableOption(AANTAL_MENSEN_AIRTABLE, mensen) || "",
+    tools: toolsMapped,
   };
 }
 
