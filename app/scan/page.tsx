@@ -106,7 +106,10 @@ function WizardSteps({ onSubmitSuccess }: WizardStepsProps) {
   const { handleSubmit } = useWizardForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   const handleFinalSubmit = async () => {
+    setSubmitError(null);
     await handleSubmit(async (data) => {
       setIsSubmitting(true);
       try {
@@ -118,12 +121,16 @@ function WizardSteps({ onSubmitSuccess }: WizardStepsProps) {
           body: JSON.stringify(data),
         });
 
+        const result = await response.json().catch(() => ({}));
+
         if (!response.ok) {
-          console.error("Intake request failed", response.status);
+          setSubmitError(result?.error ?? "Versturen mislukt. Probeer het later opnieuw.");
           return;
         }
 
         onSubmitSuccess(data);
+      } catch {
+        setSubmitError("Versturen mislukt. Controleer je internet en probeer opnieuw.");
       } finally {
         setIsSubmitting(false);
       }
@@ -136,10 +143,17 @@ function WizardSteps({ onSubmitSuccess }: WizardStepsProps) {
     case 3:  return <Step3Tijdefficiency />;
     case 4:  return <Step4Technologie />;
     case 5:  return (
-      <Step5Strategie
-        onSubmit={handleFinalSubmit}
-        isSubmitting={isSubmitting}
-      />
+      <>
+        <Step5Strategie
+          onSubmit={handleFinalSubmit}
+          isSubmitting={isSubmitting}
+        />
+        {submitError && (
+          <p className="mt-3 text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+            {submitError}
+          </p>
+        )}
+      </>
     );
     default: return null;
   }
