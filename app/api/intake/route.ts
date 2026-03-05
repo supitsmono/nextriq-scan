@@ -1,6 +1,6 @@
 const AIRTABLE_API_BASE = "https://api.airtable.com/v0";
-const INTAKES_TABLE_ID = "tblPHbJjGDPATkz4F";
-const PROCESSES_TABLE_ID = "tbltOdTDsTwBxQD7O";
+const INTAKES_TABLE = "Intakes";
+const PROCESSES_TABLE = "Processes";
 
 type WizardPayload = Record<string, unknown>;
 
@@ -23,6 +23,98 @@ function strArray(v: unknown): string[] {
   if (!Array.isArray(v)) return [];
   return v.filter((x): x is string => typeof x === "string");
 }
+
+/** Map internal value to Airtable-friendly label; fallback to original if unknown. */
+function toLabel(map: Record<string, string>, value: string): string {
+  if (!value) return "";
+  return map[value] ?? value;
+}
+
+// ─── Value → label mappings (form select values → leesbare waarden voor Airtable) ───
+const JAAROMZET_LABELS: Record<string, string> = {
+  lt200k: "< €200k",
+  "200k_500k": "€200k – €500k",
+  "500k_1m": "€500k – €1M",
+  "1m_2_5m": "€1M – €2.5M",
+  "2_5m_5m": "€2.5M – €5M",
+  "5m_10m": "€5M – €10M",
+  gt10m: "> €10M",
+};
+const MEDEWERKERS_LABELS: Record<string, string> = {
+  "1_5": "1 – 5",
+  "6_10": "6 – 10",
+  "11_25": "11 – 25",
+  "26_50": "26 – 50",
+  "51_100": "51 – 100",
+  "100plus": "100+",
+};
+const REPETITIEF_UREN_LABELS: Record<string, string> = {
+  lt5u: "< 5 uur",
+  "5_10u": "5 – 10 uur",
+  "10_20u": "10 – 20 uur",
+  "20_40u": "20 – 40 uur",
+  gt40u: "> 40 uur",
+};
+const FOUT_KOSTEN_LABELS: Record<string, string> = {
+  lt50: "< €50",
+  "50_200": "€50 – €200",
+  "200_1000": "€200 – €1.000",
+  gt1000: "€1.000+",
+  onbekend: "Weet ik niet",
+};
+const GROEI_LABELS: Record<string, string> = {
+  stabiel: "Stabiel (< 5%)",
+  "5_15pct": "5 – 15%",
+  "15_30pct": "15 – 30%",
+  gt30pct: "> 30%",
+  krimp: "Krimp",
+};
+const JA_NEE_LABELS: Record<string, string> = {
+  ja: "Ja",
+  nee: "Nee",
+};
+const AANTAL_SYSTEMEN_LABELS: Record<string, string> = {
+  "1_3": "1–3",
+  "4_6": "4–6",
+  "7_10": "7–10",
+  "10plus": "10+",
+};
+const INTEGRATIES_LABELS: Record<string, string> = {
+  volledig: "Volledig gekoppeld",
+  deels: "Deels gekoppeld",
+  niet: "Niet gekoppeld",
+  weet_niet: "Weet ik niet",
+};
+const BUDGET_LABELS: Record<string, string> = {
+  ja: "Ja",
+  overweging: "In overweging",
+  nog_niet: "Nog niet",
+};
+const TIMELINE_LABELS: Record<string, string> = {
+  "1_2m": "1–2 maanden",
+  "3_6m": "3–6 maanden",
+  "6_12m": "6–12 maanden",
+  gt12m: ">12 maanden",
+};
+const FREQUENTIE_LABELS: Record<string, string> = {
+  dagelijks: "Dagelijks",
+  wekelijks: "Wekelijks",
+  maandelijks: "Maandelijks",
+  ad_hoc: "Ad hoc",
+};
+const TIJD_PER_TAK_LABELS: Record<string, string> = {
+  lt10min: "< 10 min",
+  "10_30min": "10 – 30 min",
+  "30_60min": "30 – 60 min",
+  "1_2uur": "1 – 2 uur",
+  gt2uur: "> 2 uur",
+};
+const AANTAL_MENSEN_LABELS: Record<string, string> = {
+  "1": "1 persoon",
+  "2_3": "2 – 3 personen",
+  "4_6": "4 – 6 personen",
+  "7plus": "7 of meer",
+};
 
 /** Build Intakes table fields – Airtable field names must match exactly. */
 function buildIntakeFields(payload: WizardPayload, createdAt: string): Record<string, unknown> {
@@ -87,25 +179,25 @@ function buildIntakeFields(payload: WizardPayload, createdAt: string): Record<st
     Function: fn || "",
     Phone_number: phone || "",
     sector: sector || "",
-    Annual_Revenue: annualRevenue || "",
-    Employees: employees || "",
+    Annual_Revenue: toLabel(JAAROMZET_LABELS, annualRevenue) || annualRevenue || "",
+    Employees: toLabel(MEDEWERKERS_LABELS, employees) || employees || "",
     Lost_time: lostTime || "",
-    "Time_in_hours": timeInHours || "",
+    "Time_in_hours": toLabel(REPETITIEF_UREN_LABELS, timeInHours) || timeInHours || "",
     Mistakes: mistakes || "",
-    "Mistake costs": mistakeCosts || "",
-    "Company's grow": companyGrow || "",
+    "Mistake costs": toLabel(FOUT_KOSTEN_LABELS, mistakeCosts) || mistakeCosts || "",
+    "Company's grow": toLabel(GROEI_LABELS, companyGrow) || companyGrow || "",
     watAlsOmzetVerdubbelt: watAls || "",
     "ERP name": erpName || "",
-    "CRM usage": crmUsage || "",
+    "CRM usage": toLabel(JA_NEE_LABELS, crmUsage) || crmUsage || "",
     "CRM name": crmName || "",
     "Daily tools": dailyTools,
-    "Current Systems": currentSystems || "",
-    Integrations: integrations || "",
+    "Current Systems": toLabel(AANTAL_SYSTEMEN_LABELS, currentSystems) || currentSystems || "",
+    Integrations: toLabel(INTEGRATIES_LABELS, integrations) || integrations || "",
     "Main goal": mainGoal || "",
     prioriteiten,
     "Biggest impact": biggestImpact || "",
-    budgetAutomatisering: budget || "",
-    timeline: timeline || "",
+    budgetAutomatisering: toLabel(BUDGET_LABELS, budget) || budget || "",
+    timeline: toLabel(TIMELINE_LABELS, timeline) || timeline || "",
     extraContext: extraContext || "",
     raw_json: JSON.stringify(payload, null, 2),
   };
@@ -131,6 +223,10 @@ function buildProcessFields(
   const anders = str(process.toolsAnders);
   if (anders) tools = [...tools, anders];
 
+  const freq = pickFirst(process.frequency, process.frequentie);
+  const tijd = pickFirst(process.time_per_task, process.tijdPerKeer);
+  const mensen = pickFirst(process.people_involved, process.aantalMensen);
+
   return {
     Process: processName || "",
     created_at: createdAt,
@@ -139,9 +235,9 @@ function buildProcessFields(
     email,
     proces_index: index + 1,
     Description: pickFirst(process.description, process.beschrijving) || "",
-    frequentie: pickFirst(process.frequency, process.frequentie) || "",
-    Time: pickFirst(process.time_per_task, process.tijdPerKeer) || "",
-    aantalMensen: pickFirst(process.people_involved, process.aantalMensen) || "",
+    frequentie: toLabel(FREQUENTIE_LABELS, freq) || freq || "",
+    Time: toLabel(TIJD_PER_TAK_LABELS, tijd) || tijd || "",
+    aantalMensen: toLabel(AANTAL_MENSEN_LABELS, mensen) || mensen || "",
     tools,
   };
 }
@@ -180,7 +276,7 @@ export async function POST(req: Request) {
   try {
     // Step 1: Create Intake
     const intakeFields = buildIntakeFields(payload, createdAt);
-    const intakeUrl = `${AIRTABLE_API_BASE}/${baseId}/${INTAKES_TABLE_ID}`;
+    const intakeUrl = `${AIRTABLE_API_BASE}/${baseId}/${INTAKES_TABLE}`;
     const intakeRes = await fetch(intakeUrl, {
       method: "POST",
       headers,
@@ -236,7 +332,7 @@ export async function POST(req: Request) {
 
     let processCount = 0;
     if (processRecords.length > 0) {
-      const processUrl = `${AIRTABLE_API_BASE}/${baseId}/${PROCESSES_TABLE_ID}`;
+      const processUrl = `${AIRTABLE_API_BASE}/${baseId}/${PROCESSES_TABLE}`;
       const processRes = await fetch(processUrl, {
         method: "POST",
         headers,
