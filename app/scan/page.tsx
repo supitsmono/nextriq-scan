@@ -123,10 +123,10 @@ function WizardSteps({ onSubmitSuccess }: WizardStepsProps) {
         const result = await response.json().catch(() => ({}));
 
         if (!response.ok) {
-          setSubmitError(
-            (result as { error?: string })?.error ??
-              "Versturen mislukt. Probeer het later opnieuw."
-          );
+          const res = result as { error?: string; details?: string };
+          const msg = res?.error ?? "Versturen mislukt. Probeer het later opnieuw.";
+          const details = res?.details ? ` (${res.details})` : "";
+          setSubmitError(msg + details);
           return;
         }
 

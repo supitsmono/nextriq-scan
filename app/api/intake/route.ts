@@ -190,8 +190,19 @@ export async function POST(req: Request) {
     if (!intakeRes.ok) {
       const errText = await intakeRes.text();
       console.error("Airtable Intakes error", intakeRes.status, errText);
+      let airtableMessage = "";
+      try {
+        const errJson = JSON.parse(errText) as { error?: { message?: string } };
+        airtableMessage = errJson?.error?.message ?? errText;
+      } catch {
+        airtableMessage = errText.slice(0, 200);
+      }
       return Response.json(
-        { success: false, error: "Kon intake niet opslaan" },
+        {
+          success: false,
+          error: "Kon intake niet opslaan",
+          details: airtableMessage,
+        },
         { status: 502 }
       );
     }
