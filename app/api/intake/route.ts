@@ -1,11 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+export async function POST(req: Request) {
+  const payload = await req.json();
 
-export async function POST(request: NextRequest) {
-  const body = await request.json();
+  // tijdelijke mock verwerking
+  console.log("Intake ontvangen:", payload);
 
-  // eslint-disable-next-line no-console
-  console.log("📥 Nieuwe AI Intelligence Scan intake:", body);
-
-  return NextResponse.json({ ok: true });
+  return Response.json({ ok: true });
 }
-
