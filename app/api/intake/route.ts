@@ -147,11 +147,14 @@ function buildProcessFields(
 }
 
 export async function POST(req: Request) {
-  const token = process.env.AIRTABLE_API_TOKEN;
+  const token =
+    process.env.AIRTABLE_API_TOKEN ?? process.env.AIRTABLE_API_CODE;
   const baseId = process.env.AIRTABLE_BASE_ID;
 
   if (!token || !baseId) {
-    console.error("Missing AIRTABLE_API_TOKEN or AIRTABLE_BASE_ID");
+    console.error(
+      "Missing AIRTABLE_API_TOKEN/AIRTABLE_API_CODE or AIRTABLE_BASE_ID"
+    );
     return Response.json(
       { success: false, error: "Server configuratie ontbreekt" },
       { status: 500 }
