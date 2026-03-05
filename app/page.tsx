@@ -8,7 +8,7 @@ export default function HomePage() {
         {/* Badge */}
         <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1.5 text-xs font-semibold text-indigo-700 tracking-wide">
           <Sparkles className="h-3.5 w-3.5" />
-          Gratis · Resultaat binnen 2 werkdagen
+          AI Intelligence Scan · Persoonlijk rapport
         </div>
 
         {/* Logo + headline */}
@@ -27,7 +27,7 @@ export default function HomePage() {
             </span>
           </h1>
           <p className="text-lg text-zinc-500 max-w-xl mx-auto leading-relaxed">
-            Vul de gratis Intelligence Scan in en ontvang een persoonlijk rapport
+            Vul de Intelligence Scan in en ontvang een persoonlijk rapport
             met concrete AI-besparingsmogelijkheden voor jouw organisatie.
           </p>
         </div>
@@ -39,10 +39,10 @@ export default function HomePage() {
             className="group inline-flex items-center gap-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-indigo-200 hover:shadow-xl hover:shadow-indigo-300 transition-all duration-200 hover:-translate-y-0.5"
           >
             <Sparkles className="h-4 w-4" />
-            Start mijn gratis scan
+            Start de scan
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
-          <p className="text-xs text-zinc-400">Duurt ca. 5 minuten · Geen creditcard nodig</p>
+          <p className="text-xs text-zinc-400">Vul de scan in op jouw tempo</p>
         </div>
 
         {/* Feature pills */}
