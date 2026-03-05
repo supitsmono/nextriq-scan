@@ -105,7 +105,6 @@ function WizardSteps({ onSubmitSuccess }: WizardStepsProps) {
   const { currentStep } = useWizard();
   const { handleSubmit } = useWizardForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleFinalSubmit = async () => {
@@ -124,13 +123,18 @@ function WizardSteps({ onSubmitSuccess }: WizardStepsProps) {
         const result = await response.json().catch(() => ({}));
 
         if (!response.ok) {
-          setSubmitError(result?.error ?? "Versturen mislukt. Probeer het later opnieuw.");
+          setSubmitError(
+            (result as { error?: string })?.error ??
+              "Versturen mislukt. Probeer het later opnieuw."
+          );
           return;
         }
 
         onSubmitSuccess(data);
       } catch {
-        setSubmitError("Versturen mislukt. Controleer je internet en probeer opnieuw.");
+        setSubmitError(
+          "Versturen mislukt. Controleer je internet en probeer opnieuw."
+        );
       } finally {
         setIsSubmitting(false);
       }
