@@ -2,6 +2,8 @@ import { formatRapport } from "@/lib/formatRapport";
 import type { WizardFormData } from "@/lib/schema";
 import ScanItem from "./ScanItem";
 
+export const dynamic = "force-dynamic";
+
 interface AirtableRecord {
   id: string;
   fields: Record<string, unknown>;
@@ -47,9 +49,24 @@ export default async function InternPage({
   searchParams: Promise<{ pw?: string }>;
 }) {
   const { pw } = await searchParams;
-  const password = process.env.INTERN_PASSWORD;
+  const expectedPassword = process.env.INTERN_PASSWORD;
 
-  if (password && pw !== password) {
+  if (!expectedPassword) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-zinc-50">
+        <div className="text-center space-y-2">
+          <p className="text-sm font-semibold text-zinc-700">
+            INTERN_PASSWORD is niet geconfigureerd
+          </p>
+          <p className="text-xs text-zinc-400">
+            Stel in Vercel de environment variable INTERN_PASSWORD in en redeploy.
+          </p>
+        </div>
+      </main>
+    );
+  }
+
+  if (pw !== expectedPassword) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-zinc-50">
         <div className="text-center space-y-2">
