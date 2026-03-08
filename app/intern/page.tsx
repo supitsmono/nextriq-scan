@@ -4,43 +4,14 @@ import ScanItem from "./ScanItem";
 
 export const dynamic = "force-dynamic";
 
-interface AirtableRecord {
+/** Placeholder: geen externe opslag meer. Vul later met eigen backend/database als je scans weer wilt tonen. */
+interface SubmissionRecord {
   id: string;
-  fields: Record<string, unknown>;
+  fields: { Company?: string; Name?: string; email?: string; created_at?: string; raw_json?: string };
 }
 
-async function getSubmissions(): Promise<AirtableRecord[]> {
-  const token =
-    process.env.AIRTABLE_API_TOKEN ?? process.env.AIRTABLE_API_CODE;
-  const baseId = process.env.AIRTABLE_BASE_ID;
-
-  if (!token || !baseId) return [];
-
-  const params = new URLSearchParams({
-    "fields[]": "Company",
-    "sort[0][field]": "created_at",
-    "sort[0][direction]": "desc",
-    maxRecords: "100",
-  });
-  // Also fetch these fields
-  params.append("fields[]", "email");
-  params.append("fields[]", "Name");
-  params.append("fields[]", "created_at");
-  params.append("fields[]", "raw_json");
-
-  const url = `https://api.airtable.com/v0/${baseId}/Intakes?${params.toString()}`;
-
-  try {
-    const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${token}` },
-      cache: "no-store",
-    });
-    if (!res.ok) return [];
-    const data = (await res.json()) as { records?: AirtableRecord[] };
-    return data.records ?? [];
-  } catch {
-    return [];
-  }
+function getSubmissions(): SubmissionRecord[] {
+  return [];
 }
 
 export default async function InternPage({
@@ -79,7 +50,7 @@ export default async function InternPage({
     );
   }
 
-  const records = await getSubmissions();
+  const records = getSubmissions();
 
   return (
     <main className="min-h-screen bg-zinc-50 px-4 py-10">

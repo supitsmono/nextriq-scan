@@ -101,28 +101,8 @@ function WizardSteps({ onSubmitSuccess }: WizardStepsProps) {
     await handleSubmit(async (data) => {
       setIsSubmitting(true);
       try {
-        const response = await fetch("/api/intake", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        });
-
-        const result = await response.json().catch(() => ({}));
-
-        if (!response.ok) {
-          const res = result as { error?: string; details?: string };
-          const msg = res?.error ?? "Versturen mislukt. Probeer het later opnieuw.";
-          const details = res?.details ? ` (${res.details})` : "";
-          setSubmitError(msg + details);
-          return;
-        }
-
         clearSavedProgress();
         onSubmitSuccess(data);
-      } catch {
-        setSubmitError(
-          "Versturen mislukt. Controleer je internet en probeer opnieuw."
-        );
       } finally {
         setIsSubmitting(false);
       }
