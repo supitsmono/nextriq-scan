@@ -20,7 +20,7 @@ import { Step10Strategie } from "@/components/steps/Step10Strategie";
 import { Button } from "@/components/ui/button";
 import type { WizardFormData } from "@/lib/schema";
 
-// ─── Success screen ──────────────────────────────────────────────────────────
+// ─── Success screen ───────────────────────────────────────────────────────────
 
 function SuccessScreen({ data }: { data: WizardFormData }) {
   return (
@@ -84,7 +84,7 @@ function SuccessScreen({ data }: { data: WizardFormData }) {
   );
 }
 
-// ─── Wizard steps renderer ───────────────────────────────────────────────────
+// ─── Wizard steps renderer ────────────────────────────────────────────────────
 
 interface WizardStepsProps {
   onSubmitSuccess: (data: WizardFormData) => void;
@@ -156,24 +156,13 @@ function WizardSteps({ onSubmitSuccess }: WizardStepsProps) {
   }
 }
 
-// ─── Page ────────────────────────────────────────────────────────────────────
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ScanPage() {
   const [submitted, setSubmitted] = useState(false);
   const [submittedData, setSubmittedData] = useState<WizardFormData | null>(null);
 
   return (
-    /**
-     * Provider volgorde (buiten → binnen):
-     * 1. WizardFormProvider  → 1 useForm voor alle stappen + FormProvider (RHF)
-     * 2. WizardProvider      → stap-navigatie (currentStep, goNext, goBack)
-     * 3. WizardLayout        → card shell + progress bar + animaties
-     * 4. WizardSteps / SuccessScreen
-     *
-     * WizardNavigation heeft toegang tot beide providers:
-     *  - useWizardForm() → trigger(fields)
-     *  - useWizard()     → goNext / goBack
-     */
     <WizardFormProvider>
       <WizardProvider>
         <WizardLayout hideProgress={submitted}>
