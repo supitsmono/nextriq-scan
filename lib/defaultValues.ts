@@ -1,56 +1,136 @@
 import type { DefaultValues } from "react-hook-form";
 import type { WizardFormData } from "./schema";
 
-/**
- * DefaultValues<T> = DeepPartial<T> — staat undefined toe voor required fields.
- * Dit is nodig omdat frequentie / tijdPerKeer / aantalMensen required enums zijn
- * maar nog niet zijn ingevuld bij het openen van de wizard.
- */
 export const defaultValues: DefaultValues<WizardFormData> = {
-  // ── Step 1: Bedrijf ──────────────────────────────────────────────────
-  bedrijfsnaam: "",
+  // ── Sectie 1: Bedrijfsprofiel ────────────────────────────────────────────
+  email: "",
   naam: "",
   functie: "",
-  email: "",
   telefoon: "",
+  linkedin: "",
+  bedrijfsnaam: "",
+  kvk: "",
+  website: "",
+  vestigingsplaats: "",
+  aantalVestigingen: "",
   sector: "",
+  bedrijfsBeschrijving: "",
   jaaromzet: "",
   aantalMedewerkers: "",
+  bedrijfsStructuur: "",
 
-  // ── Step 2: Kernprocessen ────────────────────────────────────────────
+  // ── Sectie 2: Processen ──────────────────────────────────────────────────
   processen: [
     {
       procesNaam: "",
-      beschrijving: "",
-      // frequentie, tijdPerKeer, aantalMensen, volumePerMaand → undefined (required by Zod, leeg tot selectie)
-      tools: [],
-      toolsAnders: "",
+      afdeling: "",
+      stapVoorStap: "",
+      aantalMensen: "",
+      tools: "",
+      kostenPerFout: "",
     },
   ],
 
-  // ── Step 3: Tijd & Inefficiëntie ────────────────────────────────────
-  waarGaatTijdVerloren: [],
-  repetitiefWerkUren: "",
+  // ── Sectie 3: Pijnpunten ─────────────────────────────────────────────────
+  drieGrootsFrustraties: "",
+  tijdVerliesPerWeek: "",
+  repetitieveTaken: [],
+  percentageRepetitief: "",
   waarGaanFoutenMis: "",
-  gemiddeldeFoutKosten: "",
+  gevolgFouten: [],
+  foutKostenPerMaand: "",
   bedrijfsgroei: "",
   watAlsOmzetVerdubbelt: "",
+  bottlenecksGroei: "",
+  personeelTekort: "",
 
-  // ── Step 4: Technologie ──────────────────────────────────────────────
+  // ── Sectie 4: Data & Informatiebeheer ────────────────────────────────────
+  informatieWaarLeeft: [],
+  dataConsistentie: "",
+  dataVertrouwen: "",
+  dataSoorten: [],
+  inzichtBedrijfsprestaties: [],
+  metricsGoedZicht: "",
+  metricsBeterInzicht: "",
+  rapportageDuur: "",
+  documentenBeheer: [],
+  documentZoekenDuur: "",
+
+  // ── Sectie 5: Technologie ────────────────────────────────────────────────
   erpGebruik: "nee",
   erpNaam: "",
   crmGebruik: "nee",
   crmNaam: "",
+  boekhoudsoftware: [],
+  planningsoplossing: "",
+  planningsSoftwareNaam: "",
   dagelijkseTools: [],
+  interneCommunicatie: [],
   aantalSystemen: "",
   integraties: "",
-  dataOpslag: [],
+  handmatigeDataOverzet: "",
+  automatiseringsErvaring: "",
+  itVolwassenheid: "",
 
-  // ── Step 5: Strategie ────────────────────────────────────────────────
+  // ── Sectie 6: Klant & Sales ──────────────────────────────────────────────
+  salesProces: "",
+  leadTotDealDoorlooptijd: "",
+  conversieratio: "",
+  leadsAfhaakpunt: "",
+  tijdOftesPerWeek: "",
+  klantvragenPerDag: "",
+  reactietijdKlant: "",
+  soortKlantvragen: [],
+  klanttevredenheidNPS: "",
+  klantretentie: "",
+  aantalActieveKlanten: "",
+  klantsegmentatie: "",
+  upsellCrossSell: "",
+
+  // ── Sectie 7: Team & HR ──────────────────────────────────────────────────
+  bedrijfsOrganisatie: "",
+  aanwezigeRollen: [],
+  percentageRepetitieveWerkers: "",
+  sleutelmedewerkerRisico: "",
+  onboardingDuur: "",
+  onboardingGestandaardiseerd: "",
+  teamHoudingAI: "",
+  technischeAffiniteit: "",
+  gebruiksgemakBelang: "",
+
+  // ── Sectie 8: Financieel & ROI ───────────────────────────────────────────
+  grootsteKostenpost: "",
+  brutomarge: "",
+  gemiddeldUurtarief: "",
+  budgetAI: "",
+  roiBeoordeling: "",
+  eerdereInvesteringen: "",
+  waarde40Uur: "",
+  bewijsSuccesAI: [],
+
+  // ── Sectie 9: AI-Gereedheid ──────────────────────────────────────────────
+  huidigeAITools: [],
+  aiGebruikWijze: [],
+  agentBegrip: "",
+  automatiseringsKandidaten: [],
+  comfortNiveauAI: "",
+  dataToegangAI: [],
+  sectorRegelgeving: "",
+  klantdataPrivacy: [],
+  aiTraceerbaarheid: "",
+
+  // ── Sectie 10: Strategie & Visie ─────────────────────────────────────────
   belangrijksteDoel: "",
-  prioriteiten: [],
+  topPrioriteiten: [],
   grootsteImpact: "",
-  budgetAutomatisering: "",
-  timeline: "",
-  extraContext: "",
+  eersteResultatenTimeline: "",
+  bedrijfOver3Jaar: "",
+  rolAIToekomst: "",
+  aiExpertiseBeslissing: "",
+  samenwerkingsVorm: "",
+  startSnelheid: "",
+  aanleiding: "",
+  eerderAIBureaus: "",
+  bijzonderheden: "",
+  hoeGevonden: "",
 };

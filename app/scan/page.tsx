@@ -1,96 +1,85 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Clock, FileText, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 
 import { WizardProvider, useWizard } from "@/components/wizard/WizardProvider";
-import { WizardFormProvider, useWizardForm } from "@/components/wizard/WizardFormProvider";
+import { WizardFormProvider, useWizardForm, clearSavedProgress } from "@/components/wizard/WizardFormProvider";
 import { WizardLayout } from "@/components/wizard/WizardLayout";
 import { Step1Bedrijf } from "@/components/steps/Step1Bedrijf";
 import { Step2Kernprocessen } from "@/components/steps/Step2Kernprocessen";
-import { Step3Tijdefficiency } from "@/components/steps/Step3Tijdefficiency";
-import { Step4Technologie } from "@/components/steps/Step4Technologie";
-import { Step5Strategie } from "@/components/steps/Step5Strategie";
+import { Step3Pijnpunten } from "@/components/steps/Step3Pijnpunten";
+import { Step4DataBeheer } from "@/components/steps/Step4DataBeheer";
+import { Step5Technologie } from "@/components/steps/Step5Technologie";
+import { Step6KlantSales } from "@/components/steps/Step6KlantSales";
+import { Step7Team } from "@/components/steps/Step7Team";
+import { Step8Financieel } from "@/components/steps/Step8Financieel";
+import { Step9AIGereedheid } from "@/components/steps/Step9AIGereedheid";
+import { Step10Strategie } from "@/components/steps/Step10Strategie";
 import { Button } from "@/components/ui/button";
 import type { WizardFormData } from "@/lib/schema";
 
 // ─── Success screen ──────────────────────────────────────────────────────────
 
 function SuccessScreen({ data }: { data: WizardFormData }) {
-  const prioriteiten = data.prioriteiten ?? [];
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      className="flex flex-col items-center text-center py-8 space-y-6"
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="flex flex-col items-center text-center py-10 space-y-6"
     >
-      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-200">
-        <CheckCircle2 className="h-8 w-8 text-white" />
+      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 shadow-xl shadow-violet-200">
+        <CheckCircle2 className="h-10 w-10 text-white" />
       </div>
 
-      <div className="space-y-1.5 max-w-md mx-auto">
-        <h2 className="text-xl font-bold text-zinc-900">
-          Bedankt voor uw aanvraag
-        </h2>
+      <div className="space-y-2 max-w-md mx-auto">
+        <h2 className="text-2xl font-bold text-zinc-900">Scan ontvangen — bedankt!</h2>
         <p className="text-sm text-zinc-500 leading-relaxed">
-          Uw AI Intelligence Scan wordt voorbereid. Binnen{" "}
-          <strong>24 uur</strong> ontvangt u een analyse van de grootste
-          automatiseringskansen in uw bedrijf.
+          Uw NEXTRIQ AI Intelligence Scan is volledig ingevuld. Binnen{" "}
+          <strong className="text-zinc-700">48 uur</strong> ontvangt u een gepersonaliseerd
+          rapport met concrete AI-aanbevelingen en een ROI-berekening op maat.
         </p>
       </div>
 
-      {/* Korte samenvatting van de ingevulde data */}
-      <div className="w-full max-w-xl rounded-xl bg-zinc-50 border border-zinc-100 px-4 py-3.5 text-left space-y-2">
-        <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wide">
-          Samenvatting
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-zinc-600">
-          <div>
-            <p className="font-medium text-zinc-800">Bedrijf</p>
-            <p>{data.bedrijfsnaam || "Niet opgegeven"}</p>
+      <div className="w-full max-w-md rounded-xl bg-violet-50 border border-violet-200 px-5 py-4 text-left space-y-3">
+        <p className="text-xs font-bold text-violet-700 uppercase tracking-widest">Wat gebeurt er nu?</p>
+        {[
+          { icon: FileText, text: "Uw antwoorden worden geanalyseerd door ons AI-team" },
+          { icon: Sparkles, text: "We identificeren de grootste automatiseringskansen" },
+          { icon: Clock, text: "Binnen 48 uur ontvangt u uw persoonlijke rapport" },
+        ].map(({ icon: Icon, text }, i) => (
+          <div key={i} className="flex items-start gap-3">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-violet-100">
+              <Icon className="h-3.5 w-3.5 text-violet-600" />
+            </div>
+            <p className="text-sm text-zinc-600 leading-relaxed">{text}</p>
           </div>
-          <div>
-            <p className="font-medium text-zinc-800">Belangrijkste doel</p>
-            <p className="line-clamp-2">
-              {data.belangrijksteDoel || "Niet opgegeven"}
-            </p>
-          </div>
-          <div>
-            <p className="font-medium text-zinc-800">Prioriteiten</p>
-            <p>
-              {prioriteiten.length > 0
-                ? prioriteiten.join(", ")
-                : "Geen prioriteiten geselecteerd"}
-            </p>
-          </div>
-          <div>
-            <p className="font-medium text-zinc-800">Grootste impact</p>
-            <p className="line-clamp-2">
-              {data.grootsteImpact || "Niet opgegeven"}
-            </p>
-          </div>
+        ))}
+      </div>
+
+      <div className="w-full max-w-md rounded-xl bg-zinc-50 border border-zinc-100 px-5 py-4 text-left space-y-3">
+        <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Samenvatting</p>
+        <div className="grid grid-cols-2 gap-3 text-xs text-zinc-600">
+          <div><p className="font-semibold text-zinc-800">Bedrijf</p><p>{data.bedrijfsnaam || "—"}</p></div>
+          <div><p className="font-semibold text-zinc-800">E-mail</p><p>{data.email || "—"}</p></div>
+          <div><p className="font-semibold text-zinc-800">Sector</p><p>{data.sector || "—"}</p></div>
+          <div><p className="font-semibold text-zinc-800">Processen</p><p>{data.processen?.length ?? 0} ingevuld</p></div>
+          <div className="col-span-2"><p className="font-semibold text-zinc-800">Belangrijkste doel</p><p className="line-clamp-2">{data.belangrijksteDoel || "—"}</p></div>
         </div>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 pt-2">
-        <Button
-          variant="default"
-          onClick={() => window.location.assign("/scan")}
-          className="min-w-[160px]"
-        >
+        <Button variant="default" onClick={() => { clearSavedProgress(); window.location.assign("/scan"); }}
+          className="min-w-[160px] bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700">
           Nieuwe scan starten
         </Button>
-        <Button
-          variant="outline"
-          onClick={() => window.location.assign("/")}
-          className="min-w-[160px]"
-        >
+        <Button variant="outline" onClick={() => window.location.assign("/")} className="min-w-[160px]">
           Terug naar homepage
         </Button>
       </div>
+      <p className="text-xs text-zinc-400">nextriq.nl · Samen bouwen. Samen groeien.</p>
     </motion.div>
   );
 }
@@ -114,9 +103,7 @@ function WizardSteps({ onSubmitSuccess }: WizardStepsProps) {
       try {
         const response = await fetch("/api/intake", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),
         });
 
@@ -130,6 +117,7 @@ function WizardSteps({ onSubmitSuccess }: WizardStepsProps) {
           return;
         }
 
+        clearSavedProgress();
         onSubmitSuccess(data);
       } catch {
         setSubmitError(
@@ -144,11 +132,16 @@ function WizardSteps({ onSubmitSuccess }: WizardStepsProps) {
   switch (currentStep) {
     case 1:  return <Step1Bedrijf />;
     case 2:  return <Step2Kernprocessen />;
-    case 3:  return <Step3Tijdefficiency />;
-    case 4:  return <Step4Technologie />;
-    case 5:  return (
+    case 3:  return <Step3Pijnpunten />;
+    case 4:  return <Step4DataBeheer />;
+    case 5:  return <Step5Technologie />;
+    case 6:  return <Step6KlantSales />;
+    case 7:  return <Step7Team />;
+    case 8:  return <Step8Financieel />;
+    case 9:  return <Step9AIGereedheid />;
+    case 10: return (
       <>
-        <Step5Strategie
+        <Step10Strategie
           onSubmit={handleFinalSubmit}
           isSubmitting={isSubmitting}
         />

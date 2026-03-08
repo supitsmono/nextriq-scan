@@ -1,18 +1,17 @@
 "use client";
 
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useEffect } from "react";
 import { useForm, FormProvider, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { wizardSchema, WizardFormData } from "@/lib/schema";
 import { defaultValues } from "@/lib/defaultValues";
 
-// ─── Context ────────────────────────────────────────────────────────────────
+const STORAGE_KEY = "nextriq_scan_progress";
 
-const WizardFormContext = createContext<UseFormReturn<WizardFormData> | null>(
-  null
-);
+// ─── Context ──────────────────────────────────────────────────────────────────
 
-/** Geeft toegang tot het volledige RHF form object (control, trigger, watch…) */
+const WizardFormContext = createContext<UseFormReturn<WizardFormData> | null>(null);
+
 export function useWizardForm(): UseFormReturn<WizardFormData> {
   const ctx = useContext(WizardFormContext);
   if (!ctx)
@@ -20,29 +19,53 @@ export function useWizardForm(): UseFormReturn<WizardFormData> {
   return ctx;
 }
 
-// ─── Provider ────────────────────────────────────────────────────────────────
+// ─── Provider ─────────────────────────────────────────────────────────────────
 
 interface WizardFormProviderProps {
   children: React.ReactNode;
 }
 
+function getSavedValues(): Partial<WizardFormData> | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
 export function WizardFormProvider({ children }: WizardFormProviderProps) {
+  const saved = getSavedValues();
+
   const form = useForm<WizardFormData>({
     resolver: zodResolver(wizardSchema),
-    defaultValues,
-    /**
-     * onTouched: validatie wordt getoond zodra een veld verlaten is (blur).
-     * Daarna wordt live gevalideerd bij elke keystroke totdat de fout weg is.
-     * Meest gebruiksvriendelijke mode voor een wizard.
-     */
+    defaultValues: saved ? { ...defaultValues, ...saved } : defaultValues,
     mode: "onTouched",
   });
 
+  // Auto-save to localStorage on every change
+  useEffect(() => {
+    const subscription = form.watch((values) => {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
+      } catch {
+        // quota exceeded — ignore
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
+
   return (
-    // WizardFormContext → geeft trigger() toegang aan WizardNavigation
-    // FormProvider      → maakt useFormContext() beschikbaar in alle steps
     <WizardFormContext.Provider value={form}>
       <FormProvider {...form}>{children}</FormProvider>
     </WizardFormContext.Provider>
   );
+}
+
+/** Call this after successful submission to clear saved progress */
+export function clearSavedProgress() {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem(STORAGE_KEY);
+  }
 }

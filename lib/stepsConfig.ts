@@ -4,50 +4,61 @@ export interface StepConfig {
   id: number;
   title: string;
   subtitle: string;
-  /** Top-level keys van WizardFormData die bij deze stap horen.
-   *  WizardNavigation roept trigger(fields) aan vóór het doorgaan. */
+  timeEstimate: string; // e.g. "~3 min"
   fields: (keyof WizardFormData)[];
 }
 
 export const STEPS_CONFIG: StepConfig[] = [
   {
     id: 1,
-    title: "Bedrijfsinformatie",
-    subtitle: "Vertel ons over je organisatie",
+    title: "Contactgegevens & Bedrijfsprofiel",
+    subtitle: "Basisinformatie om het rapport op maat te maken",
+    timeEstimate: "~3 min",
     fields: [
-      "bedrijfsnaam",
+      "email",
       "naam",
       "functie",
-      "email",
-      "telefoon",
+      "bedrijfsnaam",
+      "vestigingsplaats",
       "sector",
+      "bedrijfsBeschrijving",
       "jaaromzet",
       "aantalMedewerkers",
     ],
   },
   {
     id: 2,
-    title: "Kernprocessen",
-    subtitle: "Welke processen voert je team dagelijks uit?",
+    title: "Procesinventarisatie",
+    subtitle: "Beschrijf uw 5 meest tijdsintensieve bedrijfsprocessen",
+    timeEstimate: "~8 min",
     fields: ["processen"],
   },
   {
     id: 3,
-    title: "Tijd & Inefficiëntie",
-    subtitle: "Waar lekt tijd weg en waar zitten fouten?",
+    title: "Pijnpunten & Bottlenecks",
+    subtitle: "Waar zitten de knelpunten en verborgen kosten?",
+    timeEstimate: "~4 min",
     fields: [
-      "waarGaatTijdVerloren",
-      "repetitiefWerkUren",
+      "drieGrootsFrustraties",
+      "tijdVerliesPerWeek",
+      "repetitieveTaken",
       "waarGaanFoutenMis",
-      "gemiddeldeFoutKosten",
       "bedrijfsgroei",
       "watAlsOmzetVerdubbelt",
     ],
   },
   {
     id: 4,
-    title: "Technologie & systemen",
-    subtitle: "Welke tools gebruikt uw bedrijf momenteel?",
+    title: "Data & Informatiebeheer",
+    subtitle: "Hoe uw data is georganiseerd bepaalt welke AI-oplossingen mogelijk zijn",
+    timeEstimate: "~3 min",
+    fields: ["informatieWaarLeeft"],
+  },
+  {
+    id: 5,
+    title: "Technologie & Systemen",
+    subtitle: "Een volledig beeld van uw techstack",
+    timeEstimate: "~3 min",
     fields: [
       "erpGebruik",
       "erpNaam",
@@ -59,15 +70,42 @@ export const STEPS_CONFIG: StepConfig[] = [
     ],
   },
   {
-    id: 5,
-    title: "Strategie & Doelen",
-    subtitle: "Wat wil je bereiken met AI?",
+    id: 6,
+    title: "Klantbeleving & Sales",
+    subtitle: "Hoe u klanten aantrekt, bedient en behoudt",
+    timeEstimate: "~3 min",
+    fields: ["salesProces"],
+  },
+  {
+    id: 7,
+    title: "Team, Organisatie & HR",
+    subtitle: "Hoe AI uw mensen kan ondersteunen",
+    timeEstimate: "~3 min",
+    fields: ["sleutelmedewerkerRisico"],
+  },
+  {
+    id: 8,
+    title: "Financiële Situatie & ROI",
+    subtitle: "Eerlijke berekening van wat AI-automatisering u oplevert",
+    timeEstimate: "~3 min",
+    fields: ["budgetAI"],
+  },
+  {
+    id: 9,
+    title: "AI-Gereedheid & Agent-Readiness",
+    subtitle: "Welke AI-oplossingen zijn nu al mogelijk voor uw bedrijf?",
+    timeEstimate: "~4 min",
+    fields: ["automatiseringsKandidaten"],
+  },
+  {
+    id: 10,
+    title: "Strategische Doelen & Visie",
+    subtitle: "Waar wilt u naartoe? Hoe ambitieuzer, hoe concreter het advies",
+    timeEstimate: "~4 min",
     fields: [
       "belangrijksteDoel",
-      "prioriteiten",
+      "topPrioriteiten",
       "grootsteImpact",
-      "budgetAutomatisering",
-      "timeline",
     ],
   },
 ];

@@ -1,287 +1,104 @@
 "use client";
 
 import { useFormContext } from "react-hook-form";
-import { Building2, Mail, Phone, User, Briefcase } from "lucide-react";
-
-import {
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-} from "@/components/ui/form";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { WizardNavigation } from "@/components/wizard/WizardNavigation";
-import { WizardFormData } from "@/lib/schema";
+import type { WizardFormData } from "@/lib/schema";
 
-// ─── Options ─────────────────────────────────────────────────────────────────
-
-const SECTOREN = [
-  "Handel & Retail",
-  "Productie & Industrie",
-  "Zakelijke dienstverlening",
-  "Technologie & IT",
-  "Bouw & Vastgoed",
-  "Transport & Logistiek",
-  "Zorg & Welzijn",
-  "Horeca & Toerisme",
-  "Financiën & Verzekeringen",
-  "Onderwijs",
-  "Landbouw & Voedsel",
-  "Anders",
-];
-
-const JAAROMZET_OPTIONS = [
-  { value: "lt200k",     label: "< €200k" },
-  { value: "200k_500k",  label: "€200k – €500k" },
-  { value: "500k_1m",    label: "€500k – €1M" },
-  { value: "1m_2_5m",    label: "€1M – €2.5M" },
-  { value: "2_5m_5m",    label: "€2.5M – €5M" },
-  { value: "5m_10m",     label: "€5M – €10M" },
-  { value: "gt10m",      label: "> €10M" },
-];
-
-const MEDEWERKERS_OPTIONS = [
-  { value: "1_5",     label: "1 – 5" },
-  { value: "6_10",    label: "6 – 10" },
-  { value: "11_25",   label: "11 – 25" },
-  { value: "26_50",   label: "26 – 50" },
-  { value: "51_100",  label: "51 – 100" },
-  { value: "100plus", label: "100+" },
-];
-
-// ─── Helper: Input met icoon links ────────────────────────────────────────────
-
-function IconInput({
-  icon,
-  children,
-}: {
-  icon: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="relative">
-      <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">
-        {icon}
-      </span>
-      {/* pl-9 via [&_input] zodat het Input component de padding krijgt */}
-      <div className="[&_input]:pl-9">{children}</div>
-    </div>
-  );
-}
-
-// ─── Step 1: Bedrijfsinformatie ───────────────────────────────────────────────
+const SECTOREN = ["Groothandel / Distributie","Productie / Maakindustrie","Zakelijke Dienstverlening","Bouw & Installatie","Transport & Logistiek","IT & Technologie","Gezondheidszorg","Horeca & Retail","Financiële Dienstverlening","Marketing & Communicatie","Juridisch & Advies","Anders"];
+const OMZET_RANGES = ["< €250.000","€250K – €500K","€500K – €1M","€1M – €2,5M","€2,5M – €5M","€5M – €10M","> €10M"];
+const FTE_RANGES = ["1–5","6–15","16–30","31–60","61–100","> 100"];
+const STRUCTUREN = ["Eenmanszaak / ZZP","BV (eigenaar-directeur)","BV met management","Familiebedrijf","Franchiseformule","Onderdeel van groep"];
 
 export function Step1Bedrijf() {
-  const form = useFormContext<WizardFormData>();
-
+  const { control } = useFormContext<WizardFormData>();
   return (
-    <div className="mt-6 space-y-5">
-      {/* Bedrijfsnaam */}
-      <FormField
-        control={form.control}
-        name="bedrijfsnaam"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>
-              Bedrijfsnaam <span className="text-destructive">*</span>
-            </FormLabel>
-            <FormControl>
-              <IconInput icon={<Building2 className="h-4 w-4" />}>
-                <Input placeholder="ACME B.V." {...field} />
-              </IconInput>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      {/* Naam + Functie */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <FormField
-          control={form.control}
-          name="naam"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                Naam <span className="text-destructive">*</span>
-              </FormLabel>
-              <FormControl>
-                <IconInput icon={<User className="h-4 w-4" />}>
-                  <Input placeholder="Jan Jansen" autoComplete="name" {...field} />
-                </IconInput>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="functie"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                Functie <span className="text-destructive">*</span>
-              </FormLabel>
-              <FormControl>
-                <IconInput icon={<Briefcase className="h-4 w-4" />}>
-                  <Input
-                    placeholder="Directeur / Manager"
-                    autoComplete="organization-title"
-                    {...field}
-                  />
-                </IconInput>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+    <div className="space-y-6 pt-4">
+      <div className="space-y-4">
+        <p className="text-xs font-semibold text-violet-600 uppercase tracking-widest">Contactpersoon</p>
+        <FormField control={control} name="email" render={({ field }) => (
+          <FormItem><FormLabel>E-mailadres *</FormLabel><FormControl><Input type="email" placeholder="uw@bedrijf.nl" {...field} /></FormControl><FormMessage /></FormItem>
+        )} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <FormField control={control} name="naam" render={({ field }) => (
+            <FormItem><FormLabel>Volledige naam *</FormLabel><FormControl><Input placeholder="Jan de Vries" {...field} /></FormControl><FormMessage /></FormItem>
+          )} />
+          <FormField control={control} name="functie" render={({ field }) => (
+            <FormItem><FormLabel>Functietitel *</FormLabel><FormControl><Input placeholder="Directeur, COO, DGA..." {...field} /></FormControl><FormMessage /></FormItem>
+          )} />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <FormField control={control} name="telefoon" render={({ field }) => (
+            <FormItem><FormLabel>Telefoonnummer</FormLabel><FormControl><Input placeholder="+31 6 12345678" {...field} /></FormControl><FormMessage /></FormItem>
+          )} />
+          <FormField control={control} name="linkedin" render={({ field }) => (
+            <FormItem><FormLabel>LinkedIn-profiel (optioneel)</FormLabel><FormControl><Input placeholder="linkedin.com/in/..." {...field} /></FormControl><FormMessage /></FormItem>
+          )} />
+        </div>
       </div>
-
-      {/* E-mailadres */}
-      <FormField
-        control={form.control}
-        name="email"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>
-              E-mailadres <span className="text-destructive">*</span>
-            </FormLabel>
-            <FormControl>
-              <IconInput icon={<Mail className="h-4 w-4" />}>
-                <Input
-                  type="email"
-                  placeholder="jan@acme.nl"
-                  autoComplete="email"
-                  {...field}
-                />
-              </IconInput>
-            </FormControl>
-            <FormMessage />
+      <Separator />
+      <div className="space-y-4">
+        <p className="text-xs font-semibold text-violet-600 uppercase tracking-widest">Bedrijfsinformatie</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <FormField control={control} name="bedrijfsnaam" render={({ field }) => (
+            <FormItem><FormLabel>Bedrijfsnaam *</FormLabel><FormControl><Input placeholder="Bedrijf B.V." {...field} /></FormControl><FormMessage /></FormItem>
+          )} />
+          <FormField control={control} name="kvk" render={({ field }) => (
+            <FormItem><FormLabel>KvK-nummer (optioneel)</FormLabel><FormControl><Input placeholder="12345678" {...field} /></FormControl><FormMessage /></FormItem>
+          )} />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <FormField control={control} name="website" render={({ field }) => (
+            <FormItem><FormLabel>Website (optioneel)</FormLabel><FormControl><Input placeholder="www.uwbedrijf.nl" {...field} /></FormControl><FormMessage /></FormItem>
+          )} />
+          <FormField control={control} name="vestigingsplaats" render={({ field }) => (
+            <FormItem><FormLabel>Vestigingsplaats *</FormLabel><FormControl><Input placeholder="Amsterdam" {...field} /></FormControl><FormMessage /></FormItem>
+          )} />
+        </div>
+        <FormField control={control} name="aantalVestigingen" render={({ field }) => (
+          <FormItem><FormLabel>Aantal vestigingen / locaties</FormLabel><FormControl><Input placeholder="Bijv. 1 hoofdkantoor, 3 filialen" {...field} /></FormControl><FormMessage /></FormItem>
+        )} />
+        <FormField control={control} name="sector" render={({ field }) => (
+          <FormItem><FormLabel>Sector / industrie *</FormLabel>
+            <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Selecteer uw sector" /></SelectTrigger></FormControl>
+              <SelectContent>{SECTOREN.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+            </Select><FormMessage />
           </FormItem>
-        )}
-      />
-
-      {/* Telefoon — optioneel */}
-      <FormField
-        control={form.control}
-        name="telefoon"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="flex items-center gap-1.5">
-              Telefoon
-              <span className="text-xs font-normal text-muted-foreground">
-                (optioneel)
-              </span>
-            </FormLabel>
-            <FormControl>
-              <IconInput icon={<Phone className="h-4 w-4" />}>
-                <Input
-                  type="tel"
-                  placeholder="+31 6 12 34 56 78"
-                  autoComplete="tel"
-                  {...field}
-                />
-              </IconInput>
-            </FormControl>
-            <FormMessage />
+        )} />
+        <FormField control={control} name="bedrijfsBeschrijving" render={({ field }) => (
+          <FormItem><FormLabel>Beschrijf kort wat uw bedrijf doet *</FormLabel>
+            <p className="text-xs text-zinc-400 -mt-1">Wat verkoopt u? Aan wie? Wat maakt u uniek in de markt?</p>
+            <FormControl><Textarea placeholder="Bijv. Wij zijn een groothandel in industriële onderdelen, gericht op MKB-machinebouwers in de Benelux..." rows={3} {...field} /></FormControl><FormMessage />
           </FormItem>
-        )}
-      />
-
-      {/* Sector */}
-      <FormField
-        control={form.control}
-        name="sector"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>
-              Sector <span className="text-destructive">*</span>
-            </FormLabel>
-            <Select onValueChange={field.onChange} value={field.value}>
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Kies je sector" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {SECTOREN.map((s) => (
-                  <SelectItem key={s} value={s}>
-                    {s}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      {/* Jaaromzet + Aantal medewerkers */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <FormField
-          control={form.control}
-          name="jaaromzet"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                Jaaromzet <span className="text-destructive">*</span>
-              </FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecteer range" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {JAAROMZET_OPTIONS.map((o) => (
-                    <SelectItem key={o.value} value={o.value}>
-                      {o.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
+        )} />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <FormField control={control} name="jaaromzet" render={({ field }) => (
+            <FormItem><FormLabel>Jaaromzet *</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Selecteer" /></SelectTrigger></FormControl>
+                <SelectContent>{OMZET_RANGES.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}</SelectContent>
+              </Select><FormMessage />
             </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="aantalMedewerkers"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                Medewerkers <span className="text-destructive">*</span>
-              </FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecteer" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {MEDEWERKERS_OPTIONS.map((o) => (
-                    <SelectItem key={o.value} value={o.value}>
-                      {o.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
+          )} />
+          <FormField control={control} name="aantalMedewerkers" render={({ field }) => (
+            <FormItem><FormLabel>Aantal FTE *</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Selecteer" /></SelectTrigger></FormControl>
+                <SelectContent>{FTE_RANGES.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}</SelectContent>
+              </Select><FormMessage />
             </FormItem>
-          )}
-        />
+          )} />
+          <FormField control={control} name="bedrijfsStructuur" render={({ field }) => (
+            <FormItem><FormLabel>Bedrijfsstructuur</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Selecteer" /></SelectTrigger></FormControl>
+                <SelectContent>{STRUCTUREN.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+              </Select><FormMessage />
+            </FormItem>
+          )} />
+        </div>
       </div>
-
       <WizardNavigation />
     </div>
   );

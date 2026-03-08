@@ -2,37 +2,77 @@
 
 import React, { createContext, useContext, useState, useCallback } from "react";
 
-export const TOTAL_STEPS = 5;
+export const TOTAL_STEPS = 10;
 
 export const STEP_META = [
   {
     step: 1,
-    title: "Bedrijfsinformatie",
-    subtitle: "Vertel ons over je organisatie",
+    title: "Bedrijfsprofiel",
+    subtitle: "Basisinformatie om het rapport op maat te maken",
+    timeEstimate: "~3 min",
     icon: "Building2",
   },
   {
     step: 2,
-    title: "Kernprocessen",
-    subtitle: "Welke processen voert je team dagelijks uit?",
+    title: "Procesinventarisatie",
+    subtitle: "Beschrijf uw 5 meest tijdsintensieve bedrijfsprocessen",
+    timeEstimate: "~8 min",
     icon: "Workflow",
   },
   {
     step: 3,
-    title: "Tijd & Inefficiëntie",
-    subtitle: "Waar lekt tijd weg en waar zitten fouten?",
-    icon: "Clock",
+    title: "Pijnpunten & Bottlenecks",
+    subtitle: "Waar zitten de knelpunten en verborgen kosten?",
+    timeEstimate: "~4 min",
+    icon: "AlertTriangle",
   },
   {
     step: 4,
-    title: "Technologie & systemen",
-    subtitle: "Welke tools gebruikt uw bedrijf momenteel?",
-    icon: "Cpu",
+    title: "Data & Informatiebeheer",
+    subtitle: "Hoe is uw data georganiseerd?",
+    timeEstimate: "~3 min",
+    icon: "Database",
   },
   {
     step: 5,
-    title: "Strategie & Doelen",
-    subtitle: "Wat wil je bereiken met AI?",
+    title: "Technologie & Systemen",
+    subtitle: "Een volledig beeld van uw techstack",
+    timeEstimate: "~3 min",
+    icon: "Cpu",
+  },
+  {
+    step: 6,
+    title: "Klantbeleving & Sales",
+    subtitle: "Hoe u klanten aantrekt, bedient en behoudt",
+    timeEstimate: "~3 min",
+    icon: "Users",
+  },
+  {
+    step: 7,
+    title: "Team, Organisatie & HR",
+    subtitle: "Hoe AI uw mensen kan ondersteunen",
+    timeEstimate: "~3 min",
+    icon: "UserCheck",
+  },
+  {
+    step: 8,
+    title: "Financieel & ROI",
+    subtitle: "Eerlijke berekening van uw AI-potentieel",
+    timeEstimate: "~3 min",
+    icon: "TrendingUp",
+  },
+  {
+    step: 9,
+    title: "AI-Gereedheid",
+    subtitle: "Welke AI-oplossingen zijn nu al mogelijk?",
+    timeEstimate: "~4 min",
+    icon: "Sparkles",
+  },
+  {
+    step: 10,
+    title: "Strategie & Visie",
+    subtitle: "Waar wilt u naartoe?",
+    timeEstimate: "~4 min",
     icon: "Target",
   },
 ] as const;
